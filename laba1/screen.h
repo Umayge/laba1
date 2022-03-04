@@ -1,5 +1,4 @@
 #pragma once
-#include<iostream>
 const int XMAX = 120;
 const int YMAX = 50;
 class point
