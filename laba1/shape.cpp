@@ -2,32 +2,30 @@
 //
 
 #include <iostream>
-#include"screen.h"
 #include"shape.h"
 
 class h_circle : public rectangle, public reflectable {
 	bool reflected;
 public:
-	h_circle(point a, point b, bool r = true) : rectangle(a, b), reflected(r) { }
+	h_circle(point a, point b, bool r = true, bool p = true) : rectangle(a, b), reflected(r) { }
 	void draw();
 	void flip_horisontally() { }; // Отразить горизонтально (пустая функция)
 	void flip_vertically() { reflected = !reflected; };	// Отразить вертикально
 };
-void h_circle::draw() //Алгоритм Брезенхэма для окружностей
-{   //(выдаются два сектора, указываемые значением reflected)
-	int x0 = (sw.x + ne.x) / 2, y0 = reflected ? sw.y : ne.y;
-	int radius = (ne.x - sw.x) / 2;
-	int x = 0, y = radius, delta = 2 - 2 * radius, error = 0;
-	while (y >= 0) { // Цикл рисования
-		if (reflected) { put_point(x0 + x, y0 + y *0.7); put_point(x0 - x, y0 + y * 0.7); }
-		else { put_point(x0 + x, y0 - y *0.7); put_point(x0 - x, y0 - y * 0.7); }
-		error = 2 * (delta + y) - 1;
-		if (delta < 0 && error <= 0) { ++x; delta += 2 * x + 1; continue; }
-		error = 2 * (delta - x) - 1;
-		if (delta > 0 && error > 0) { --y; delta += 1 - 2 * y; continue; }
-		++x; delta += 2 * (x - y);  --y;
-	}
-}
+
+class h_circle1 : public reflectable, public rotatable
+{
+	int quarter1, quarter2;
+	point Centre;
+public:
+	h_circle1(point a, int q1 = 1) : Centre(a), quarter1(q1>=1 && q1<=4 ?q1:1), quarter2(q1 < 3 ? q1 + 1 : 1){}
+
+};
+
+
+
+
+
 // ПРИМЕР ДОБАВКИ: дополнительная функция присоединения…
 void down(shape& p, const shape& q)
 {
@@ -80,7 +78,10 @@ int main()
 	rectangle hat(point(0, 0), point(14, 5));
 	line brim(point(0, 15), 17);
 	myshape face(point(15, 10), point(27, 18));
-	h_circle beard(point(40, 10), point(50, 20));
+	h_circle beard(point(40, 10), point(50,10));
+	h_circle whiskers_l(point(2,10), point(12,20));
+	h_circle whiskers_r(point(40,10),point(50,10));
+	//h_circle horn_r(point(30,10),point(30,20));
 	shape_refresh();
 	std::cout << "=== Generated... ===\n";
 	std::cin.get(); //Смотреть исходный набор
@@ -89,6 +90,9 @@ int main()
 	brim.resize(2.0);
 	face.resize(2.0);
 	beard.flip_vertically();
+	whiskers_r.flip_horisontally();
+	whiskers_r.rotate_left();
+	
 	shape_refresh();
 	std::cout << "=== Prepared... ===\n";
 	std::cin.get(); //Смотреть результат поворотов/отражений
