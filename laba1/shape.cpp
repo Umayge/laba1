@@ -13,21 +13,15 @@ public:
 	void flip_vertically() { reflected = !reflected; };	// Отразить вертикально
 };
 
-class h_circle1 : public rectangle, public reflectable, public rotatable
+class h_circle1 : public rectangle, public reflectable, public rotatable //наша параша
 {
-	int radius;
 	int quarter1, quarter2;
 
 public:
 	h_circle1(point a, int r, int q1 = 1) :
-		radius(r), quarter1(q1 >= 1 && q1 <= 4 ? q1 : 1),
+		quarter1(q1 >= 1 && q1 <= 4 ? q1 : 1),
 		quarter2(quarter1 <= 3 ? quarter1 + 1 : 1),
-		/*h1(quarter1 == 1 && quarter2 == 2 || quarter1 == 3 && quarter2 == 4 ? a.x - r : a.x,
-			quarter1 == 1 && quarter2 == 2 || quarter1 == 3 && quarter2 == 4 ? a.y : a.y + r),
-		h2(quarter1 == 1 && quarter2 == 2 || quarter1 == 3 && quarter2 == 4 ? a.x + r : a.x,
-			quarter1 == 1 && quarter2 == 2 || quarter1 == 3 && quarter2 == 4 ? a.y : a.y - r)*/ rectangle(point(a.x-r,a.y-r),point(a.x+r,a.y+r)) {}
-
-
+		rectangle(point(a.x-r,a.y-r),point(a.x+r,a.y+r)) {}
 	void draw();
 	void flip_horisontally();
 	void flip_vertically();
@@ -35,7 +29,7 @@ public:
 	void rotate_right();
 };
 
-void h_circle1::flip_horisontally()
+void h_circle1::flip_horisontally()//наша параша
 {
 	if (quarter1 == 1 && quarter2 == 2)
 	{
@@ -50,7 +44,7 @@ void h_circle1::flip_horisontally()
 	}
 }
 
-void h_circle1::flip_vertically()
+void h_circle1::flip_vertically()//наша параша
 {
 	if (quarter1 == 2 && quarter2 == 3)
 	{
@@ -64,33 +58,33 @@ void h_circle1::flip_vertically()
 		quarter2 = 3;
 	}
 }
-void h_circle1::rotate_left()
+void h_circle1::rotate_left()//наша параша
 {
 	quarter1 = quarter1 + 1 <= 4 ? quarter1 + 1 : 1;
 	quarter2 = quarter2 + 1 <= 4 ? quarter2 + 1 : 1;
 }
-void h_circle1::rotate_right()
+void h_circle1::rotate_right()//наша параша
 {
 	quarter1 = quarter1 - 1 >= 1 ? quarter1 - 1 : 4;
 	quarter2 = quarter2 - 1 >= 1 ? quarter2 - 1 : 4;
 }
-void h_circle1::draw()
+void h_circle1::draw()//наша параша
 {
 	//std::cout << quarter1<<std::endl;
 	//std::cout << quarter2;
 	int x = 0;
-	int y = radius;
-	int delta = 1 - 2 * radius;
+	int y = north().y - centre().y;
+	int delta = 1 - 2 * (north().y - centre().y);
 	int error = 0;
 	while (y >= 0) {
 		if(quarter1==1 || quarter2==1)
-		put_point(centre().x + x, centre().y + y);
+			put_point(centre().x + x, centre().y + y);
 		if(quarter1==4 || quarter2==4)
-		put_point(centre().x + x, centre().y - y);
+			put_point(centre().x + x, centre().y - y);
 		if(quarter1==2 || quarter2 ==2)
-		put_point(centre().x - x, centre().y + y);
+			put_point(centre().x - x, centre().y + y);
 		if(quarter1 ==3 || quarter2 == 3)
-		put_point(centre().x - x, centre().y - y);
+			put_point(centre().x - x, centre().y - y);
 		error = 2 * (delta + y) - 1;
 		if (delta < 0 && error <= 0) {
 			++x;
@@ -139,27 +133,27 @@ void down(shape& p, const shape& q)
 	p.move(n.x - s.x, n.y - s.y - 1);
 }
 
-void sw(shape& p, const shape& q)
+void sw(shape& p, const shape& q)//наша параша
 {
 	point c = p.centre();
 	point w = q.swest();
 	p.move(w.x - c.x, w.y - c.y - 1);
 	
 }
-void se(shape& p, const shape& q)
+void se(shape& p, const shape& q)//наша параша
 {
 	point c = p.centre();
 	point w = q.seast();
 	p.move(w.x - c.x, w.y - c.y - 1);
 }
 
-void w(shape& p, const shape& q)
+void w(shape& p, const shape& q)//наша параша
 {
 	point c = p.south();
 	point w = q.west();
 	p.move(w.x - c.x, w.y - c.y);
 }
-void e(shape& p, const shape& q)
+void e(shape& p, const shape& q)//наша параша
 {
 	point c = p.south();
 	point w = q.seast();
@@ -202,7 +196,6 @@ void myshape::move(int a, int b)
 	rectangle::move(a, b);
 	l_eye.move(a, b);  r_eye.move(a, b);
 	mouth.move(a, b);
-
 }
 
 
