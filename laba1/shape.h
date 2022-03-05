@@ -16,7 +16,7 @@ struct shape { // Виртуальный базовый класс "фигура"
 	virtual point seast() const = 0;
 	virtual point nwest() const = 0;
 	virtual point swest() const = 0;
-	virtual point centre() const = 0;
+	virtual point centre() const = 0;//моё личное нововведение
 	virtual void draw() = 0;		//Рисование
 	virtual void move(int, int) = 0;	//Перемещение
 	virtual void resize(double) = 0;    	//Изменение размера
@@ -64,7 +64,8 @@ public:
 	point seast() const { return point(w.x < e.x ? e.x : w.x, e.y < w.y ? e.y : w.y); }
 	point nwest() const { return point(w.x < e.x ? w.x : e.x, e.y < w.y ? w.y : e.y); }
 	point swest() const { return point(w.x < e.x ? w.x : e.x, e.y < w.y ? e.y : w.y); }
-	point centre() const { return point(w.x < e.x ? w.x - e.x : e.x - w.x, e.y < w.y ? w.y - e.y : e.y - w.y); };
+	point centre() const { return point(w.x < e.x ? w.x - e.x : e.x - w.x,
+		e.y < w.y ? w.y - e.y : e.y - w.y); };//моё личное нововведение
 	void move(int a, int b) { w.x += a; w.y += b; e.x += a; e.y += b; }
 	void draw() { put_line(w, e); }
 	void resize(double d) // Изменение длины линии в (d) раз
@@ -95,7 +96,7 @@ public:
 	point seast() const { return point(ne.x, sw.y); }
 	point nwest() const { return point(sw.x, ne.y); }
 	point swest() const { return sw; }
-	point centre() const { return point(south().x, west().y); }
+	point centre() const { return point(south().x, west().y); }//моё личное нововведение
 	void rotate_right() // Поворот вправо относительно se
 	{
 		int w = ne.x - sw.x, h = ne.y - sw.y; //(учитывается масштаб по осям)
