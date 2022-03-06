@@ -19,7 +19,7 @@ struct shape { // Виртуальный базовый класс "фигура"
 	virtual point centre() const = 0;//моё личное нововведение
 	virtual void draw() = 0;		//Рисование
 	virtual void move(int, int) = 0;	//Перемещение
-	virtual void resize(double) = 0;    	//Изменение размера
+	virtual void resize(float) = 0;    	//Изменение размера
 	//virtual ~shape() { shapes.erase(shapes.); } //Деструктор
 };
 
@@ -68,7 +68,7 @@ public:
 		e.y < w.y ? w.y - e.y : e.y - w.y); };//моё личное нововведение
 	void move(int a, int b) { w.x += a; w.y += b; e.x += a; e.y += b; }
 	void draw() { put_line(w, e); }
-	void resize(double d) // Изменение длины линии в (d) раз
+	void resize(float d) // Изменение длины линии в (d) раз
 	{
 		e.x = w.x + (e.x - w.x) * d; e.y = w.y + (e.y - w.y) * d;
 	}
@@ -111,7 +111,7 @@ public:
 	{
 		sw.x += a; sw.y += b; ne.x += a; ne.y += b;
 	}
-	void resize(double d)
+	void resize(float d)
 	{
 		ne.x = sw.x + (ne.x - sw.x) * d; ne.y = sw.y + (ne.y - sw.y) * d;
 	}
