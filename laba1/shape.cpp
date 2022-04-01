@@ -1,6 +1,6 @@
 ﻿// laba1.cpp : Этот файл содержит функцию "main". Здесь начинается и заканчивается выполнение программы.
 //
-
+#include "Error.h"
 #include <iostream>
 #include"shape.h"
 
@@ -21,7 +21,24 @@ public:
 	h_circle1(point a, int r, int q1 = 1) :
 		quarter1(q1 >= 1 && q1 <= 4 ? q1 : 1),
 		quarter2(quarter1 <= 3 ? quarter1 + 1 : 1),
-		rectangle(point(a.x-r,a.y-r),point(a.x+r,a.y+r)) {}
+		rectangle(point(a.x-r,a.y-r),point(a.x+r,a.y+r)) {
+		try {
+			if (!on_screen(a.x, a.y)) {
+				throw WrongInit("Error while initializing circle: center is off screen");
+			}
+			else if (!on_screen(a.x + r, a.y) || !on_screen(a.x - r, a.y) || !on_screen(a.x, a.y + r) || !on_screen(a.x, a.y - r)) {
+				throw WrongInit("Error when initializing a circle: with such a radius, a part of the circle does not fit ");
+			}
+			else if (r < 0) {
+				throw WrongInit("Error while initializing circle: negative radius ");
+			}
+		}
+		catch (WrongInit& err) {
+			cout << err.what() << endl;
+			system("pause");
+			abort();
+		}
+	}
 	void draw();
 	void flip_horisontally();
 	void flip_vertically();
@@ -72,39 +89,64 @@ void h_circle1::draw()//наша параша
 {
 	//std::cout << quarter1<<std::endl;
 	//std::cout << quarter2;
-	int x = 0;
-	int y = north().y - centre().y;
-	int delta = 1 - 2 * (north().y - centre().y);
-	int error = 0;
-	while (y >= 0) {
-		if(quarter1==1 || quarter2==1)
-			put_point(centre().x + x, centre().y + y);
-		if(quarter1==4 || quarter2==4)
-			put_point(centre().x + x, centre().y - y);
-		if(quarter1==2 || quarter2 ==2)
-			put_point(centre().x - x, centre().y + y);
-		if(quarter1 ==3 || quarter2 == 3)
-			put_point(centre().x - x, centre().y - y);
-		error = 2 * (delta + y) - 1;
-		if (delta < 0 && error <= 0) {
+	try
+	{
+		int x = 0;
+		int y = north().y - centre().y;
+		int delta = 1 - 2 * (north().y - centre().y);
+		int error = 0;
+		if (north().x <0 || north().y <0 || north().y>YMAX || north().x > XMAX )
+		{
+			throw CantDraw("Error while drawing circle: point is out of screen ");
+		}
+		if (west().x <0 || west().y <0 || west().y>YMAX || west().x > XMAX)
+		{
+			throw CantDraw("Error while drawing circle: point is out of screen  ");
+		}
+		if (east().x <0 || east().y <0 || east().y>YMAX || east().x > XMAX)
+		{
+			throw CantDraw("Error while drawing circle: point is out of screen ");
+		}
+		if (south().x <0 || south().y <0 || south().y>YMAX || south().x > XMAX)
+		{
+			throw CantDraw("Error while drawing circle: point is out of screen ");
+		}
+		while (y >= 0) {
+			if (quarter1 == 1 || quarter2 == 1)
+				put_point(centre().x + x, centre().y + y);
+			if (quarter1 == 4 || quarter2 == 4)
+				put_point(centre().x + x, centre().y - y);
+			if (quarter1 == 2 || quarter2 == 2)
+				put_point(centre().x - x, centre().y + y);
+			if (quarter1 == 3 || quarter2 == 3)
+				put_point(centre().x - x, centre().y - y);
+			error = 2 * (delta + y) - 1;
+			if (delta < 0 && error <= 0) {
+				++x;
+				delta += 2 * x + 1;
+				continue;
+			}
+			error = 2 * (delta - x) - 1;
+			if (delta > 0 && error > 0) {
+				--y;
+				delta += 1 - 2 * y;
+				continue;
+			}
 			++x;
-			delta += 2 * x + 1;
-			continue;
-		}
-		error = 2 * (delta - x) - 1;
-		if (delta > 0 && error > 0) {
+			delta += 2 * (x - y);
 			--y;
-			delta += 1 - 2 * y;
-			continue;
 		}
-		++x;
-		delta += 2 * (x - y);
-		--y;
+		if (quarter1 == 1 && quarter2 == 2 || quarter1 == 3 && quarter2 == 4)
+			put_line(west(), east());
+		if (quarter1 == 2 && quarter2 == 3 || quarter1 == 4 && quarter2 == 1)
+			put_line(north(), south());
 	}
-	if(quarter1==1 && quarter2==2 || quarter1==3 && quarter2==4)
-	put_line(west(),east());
-	if(quarter1 == 2 && quarter2 == 3 || quarter1 == 4 && quarter2 == 1)
-	put_line(north(), south());
+	
+	catch (CantDraw& err) {
+		cout << err.what() << "Circle" << endl;
+	}
+	
+	
 }
 
 void h_circle::draw() //Алгоритм Брезенхэма для окружностей
@@ -133,27 +175,27 @@ void down(shape& p, const shape& q)
 	p.move(n.x - s.x, n.y - s.y - 1);
 }
 
-void sw(shape& p, const shape& q)//наша параша
+void sw(shape& p, const shape& q)//наша 
 {
 	point c = p.centre();
 	point w = q.swest();
 	p.move(w.x - c.x, w.y - c.y - 1);
 	
 }
-void se(shape& p, const shape& q)//наша параша
+void se(shape& p, const shape& q)//наша 
 {
 	point c = p.centre();
 	point w = q.seast();
 	p.move(w.x - c.x, w.y - c.y - 1);
 }
 
-void w(shape& p, const shape& q)//наша параша
+void w(shape& p, const shape& q)//наша 
 {
 	point c = p.south();
 	point w = q.west();
 	p.move(w.x - c.x, w.y - c.y);
 }
-void e(shape& p, const shape& q)//наша параша
+void e(shape& p, const shape& q)//наша 
 {
 	point c = p.south();
 	point w = q.seast();
@@ -198,6 +240,27 @@ void myshape::move(int a, int b)
 	mouth.move(a, b);
 }
 
+void move_ear_l(shape& a, const shape& b )
+{
+	point c = a.centre();
+	point w = b.west();
+	a.move(w.x - c.x, w.y - c.y+1);
+}
+void move_ear_r(shape& a, const shape& b)
+{
+
+	point c = a.centre();
+	point e = b.east();
+	a.move(e.x - c.x, e.y - c.y+1);
+}
+
+void move_emblem(shape& a, const shape& b)
+{
+	point c = a.centre();
+	point  n= b.north();
+	a.move(n.x - c.x, n.y - c.y);
+}
+
 
 int main()
 {
@@ -215,6 +278,10 @@ int main()
 	h_circle1 horn_r(point(32,23),3,1);
 	h_circle1 horn_l(point(10,23),3,1);
 	
+	h_circle1 ear_l(point(55, 30), 1, 1);
+	h_circle1 ear_r(point(58, 34), 3, 1);
+
+	h_circle1 EMBLEM(point(32, 45), 3, 1);
 
 	//h_circle horn_r(point(30,10),point(30,20));
 	shape_refresh();
@@ -228,12 +295,14 @@ int main()
 	brim.resize(2.0);
 	face.resize(2.0);
 	beard.flip_vertically();
-	
+	ear_l.resize(200000.0);
 	whiskers_r.flip_horisontally();
 	whiskers_l.flip_vertically();
 	horn_l.rotate_left();
 	horn_r.rotate_right();
-
+	ear_l.rotate_left();
+	ear_r.rotate_right();
+	EMBLEM.flip_horisontally();
 	shape_refresh();
 	std::cout << "=== Prepared... ===\n";
 	std::cin.get(); //Смотреть результат поворотов/отражений
@@ -241,7 +310,7 @@ int main()
 
 
 //== 3.Сборка изображения ==
-//	face.move(0, -10); // Лицо - в исходное положение
+//	face.move(0, -1000); // Лицо - в исходное положение
 	up(brim, face);
 	up(hat, brim);
 	down(beard, face);
@@ -249,6 +318,9 @@ int main()
 	sw(whiskers_l,face);
 	e(horn_r,brim);
 	w(horn_l,brim);
+	move_ear_l(ear_l, face);
+	move_ear_r(ear_r, face);
+	move_emblem(EMBLEM, hat);
 	whiskers_r.rotate_left();
 	shape_refresh();
 	std::cout << "=== Ready! ===\n";
@@ -256,33 +328,3 @@ int main()
 	screen_destroy();
 	return 0;
 }
-
-
-/*int main()
-{
-	setlocale(LC_ALL, "Rus");
-	screen_init();
-
-	myshape face(point(15, 10), point(27, 18));
-	h_circle1 crug(point (35,47),2,1);
-	shape_refresh();
-	crug.rotate_left();
-	shape_refresh();
-	dw(crug, face);
-
-	shape_refresh();
-	return 0;
-}*/
-
-
-
-// Запуск программы: CTRL+F5 или меню "Отладка" > "Запуск без отладки"
-// Отладка программы: F5 или меню "Отладка" > "Запустить отладку"
-
-// Советы по началу работы 
-//   1. В окне обозревателя решений можно добавлять файлы и управлять ими.
-//   2. В окне Team Explorer можно подключиться к системе управления версиями.
-//   3. В окне "Выходные данные" можно просматривать выходные данные сборки и другие сообщения.
-//   4. В окне "Список ошибок" можно просматривать ошибки.
-//   5. Последовательно выберите пункты меню "Проект" > "Добавить новый элемент", чтобы создать файлы кода, или "Проект" > "Добавить существующий элемент", чтобы добавить в проект существующие файлы кода.
-//   6. Чтобы снова открыть этот проект позже, выберите пункты меню "Файл" > "Открыть" > "Проект" и выберите SLN-файл.

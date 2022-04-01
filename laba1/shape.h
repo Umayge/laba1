@@ -1,7 +1,7 @@
 #pragma once
 #include"screen.h"
 #include <list>
-
+#include "Error.h"
 
 
 
@@ -54,8 +54,36 @@ class line : public shape {
 protected:
 	point w, e;
 public:
-	line(point a, point b) : w(a), e(b) { }; //Произвольная линия (по двум точкам)
-	line(point a, int L) : w(point(a.x + L - 1, a.y)), e(a) {  }; //Горизонтальная линия
+	line(point a, point b) : w(a), e(b) {
+		try {
+			if (!on_screen(w.x, w.y)) {
+				throw WrongInit("Line initialization error: point w goes off screen ");
+			}
+			else if (!on_screen(e.x, e.y)) {
+				throw WrongInit("Line initialization error: point e goes off screen ");
+			}
+		}
+		catch (WrongInit& err) {
+			cout << err.what() << endl;
+			system("pause");
+			abort();
+		}
+	}; //Произвольная линия (по двум точкам)
+	line(point a, int L) : w(point(a.x + L - 1, a.y)), e(a) { 
+		try {
+			if (!on_screen(w.x, w.y)) {
+				throw WrongInit("Line initialization error: point w goes off screen ");
+			}
+			else if (!on_screen(e.x, e.y)) {
+				throw WrongInit("Line initialization error: point e goes off screen ");
+			}
+		}
+		catch (WrongInit& err) {
+			cout << err.what() << endl;
+			system("pause");
+			abort();
+		}
+	}; //Горизонтальная линия
 	point north() const { return point((w.x + e.x) / 2, e.y < w.y ? w.y : e.y); }
 	point south() const { return point((w.x + e.x) / 2, e.y < w.y ? e.y : w.y); }
 	point east() const { return point(e.x < w.x ? w.x : e.x, (w.y + e.y) / 2); }
@@ -67,7 +95,14 @@ public:
 	point centre() const { return point(w.x < e.x ? w.x - e.x : e.x - w.x,
 		e.y < w.y ? w.y - e.y : e.y - w.y); };//моё личное нововведение
 	void move(int a, int b) { w.x += a; w.y += b; e.x += a; e.y += b; }
-	void draw() { put_line(w, e); }
+	void draw() { 
+		try {
+			put_line(w, e);
+		}
+		catch (CantDraw& err) {
+			cout << err.what() << "Line " << endl;
+		}
+	}
 	void resize(float d) // Изменение длины линии в (d) раз
 	{
 		e.x = w.x + (e.x - w.x) * d; e.y = w.y + (e.y - w.y) * d;
@@ -80,14 +115,28 @@ class rectangle : public rotatable {
 	/* nw ------ n ------ ne
 	   |		       |
 	   |		       |
-	   w	   c            e
+	   w	   c       e
 	   |		       |
 	   |		       |
 	   sw ------- s ------ se */
 protected:
 	point sw, ne;
 public:
-	rectangle(point a, point b) : sw(a), ne(b) { }
+	rectangle(point a, point b) : sw(a), ne(b) {
+		try {
+			if (!on_screen(sw.x, sw.y)) {
+				throw WrongInit("Error while initializing rectangle: point sw goes off screen ");
+			}
+			else if (!on_screen(ne.x, ne.y)) {
+				throw WrongInit("Error initializing rectangle: point ne goes off screen");
+			}
+		}
+		catch (WrongInit& err) {
+			cout << err.what() << endl;
+			system("pause");
+			abort();
+		}
+	}
 	point north() const { return point((sw.x + ne.x) / 2, ne.y); }
 	point south() const { return point((sw.x + ne.x) / 2, sw.y); }
 	point east() const { return point(ne.x, (sw.y + ne.y) / 2); }
@@ -117,8 +166,13 @@ public:
 	}
 	void draw()
 	{
-		put_line(nwest(), ne);   put_line(ne, seast());
-		put_line(seast(), sw);   put_line(sw, nwest());
+		try {
+			put_line(nwest(), ne); put_line(ne, seast());
+			put_line(seast(), sw); put_line(sw, nwest());
+		}
+		catch (CantDraw& err) {
+			cout << err.what() << "Rectangle" << endl;
+		}
 	}
 };
 
